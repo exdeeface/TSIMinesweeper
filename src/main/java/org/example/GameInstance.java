@@ -19,7 +19,6 @@ public class GameInstance {
         gameStarted = true;
 
         while (gameStarted) {
-
             grid.printGrid();
             playerTurn();
 
@@ -43,7 +42,7 @@ public class GameInstance {
             return false;
         } else {
             System.out.println("Spot clear.");
-            grid.matrix.get(c.x).get(c.y).setRevealed(true);
+            grid.matrix.get(c.x).get(c.y).revealTile();
             return true;
         }
     }
@@ -58,7 +57,7 @@ public class GameInstance {
             System.out.print("\nPlease enter the value of the row Coordinate:\n    >> ");
             x = scanner.nextInt()-1;
             if (x > grid.size-1 || x < 0) {
-                System.out.println("Input exceeds bounds. Please enter numbers between 01 and " + grid.size + "Try again.");
+                System.out.println("Input exceeds bounds. Please enter numbers between 1 and " + grid.size + "Try again.");
                 validX = false;
             }
         }

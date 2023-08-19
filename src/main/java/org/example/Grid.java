@@ -46,7 +46,7 @@ public class Grid {
         }
 
         for (int i = 0; i < size; i++) {
-            matrix.add(new Vector<Tile>());
+            matrix.add(new Vector<>());
             for (int j = 0; j < size; j++) {
                 matrix.get(i).add(new Tile(this, i, j));
             }
