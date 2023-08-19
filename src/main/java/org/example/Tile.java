@@ -23,7 +23,14 @@ public class Tile {
     void setFlag() { this.hasFlag = !this.hasFlag; }
 
     boolean isRevealed() { return this.isRevealed; }
-    void revealTile() { this.isRevealed = true; }
+
+    void revealTile() {
+        this.isRevealed = true;
+    }
+
+    void revealNeighbors() {
+
+    }
 
     void checkNeighbours(int size) {
         for (int i = this.here.x-1; i <= this.here.x+1; i++) {
