@@ -1,28 +1,15 @@
 package org.example;
-import java.util.Scanner;
 import java.util.Vector;
 
-//easy = 8x8 w/ 10 bombs
-//medium = 12x12 w/ 15 bombs
-//hard = 16x16 w/ 20 bombs
-//fix bomb spawning
-//for each coord, check neighbour coords
-    //how to check for edges
-
 public class Grid {
-    Scanner scanner = new Scanner(System.in);
-
     boolean gridCreated = false;
-    boolean gameStarted = false;
-    boolean gameWon = false;
 
     int difficulty;
     int size;
     int bombs;
 
-    Vector<Coordinate> bombLocations = new Vector<>();
-    Vector<Coordinate> flagLocations = new Vector<>();
-    Vector<Vector<Boolean>> grid = new Vector<Vector<Boolean>>();
+    Vector<Tile> bombLocations = new Vector<>();
+    Vector<Vector<Tile>> matrix = new Vector<>();
 
     Grid(int difficulty) {
         this.difficulty = difficulty;
@@ -32,67 +19,7 @@ public class Grid {
     void initGame() {
         this.createGrid();
         this.plantBombs();
-    }
-
-    void startGame() {
-        gameStarted = true;
-        while (gameStarted) {
-            printGrid();
-            Coordinate input = playerTurn();
-            if (!processTurn(input)) {
-                System.out.println("Bomb clicked on. Game over.");
-                gameStarted = false;
-            } else {
-                for (Coordinate c : flagLocations) {
-                    if (!bombLocations.contains(c)) {
-                        System.out.println("Nice work but more bombs to go!");
-                    } else {
-                        System.out.println("All bombs found. Well done.");
-                        gameWon = true;
-                        gameStarted = false;
-                    }
-                }
-            }
-        }
-    }
-
-    Coordinate playerTurn() {
-        int x = -1;
-        int y = -1;
-
-        boolean validX = false;
-        while (!validX) {
-            validX = true;
-            System.out.println("Please enter the x value of the coordinate:\n    ");
-            x = scanner.nextInt();
-            if (x > this.size-1) {
-                System.out.println("Input exceeds bounds. Try again.");
-                validX = false;
-            }
-        }
-
-        boolean validY = false;
-        while (!validY) {
-            validY = true;
-            System.out.println("Please enter the y value of the coordinate:\n    ");
-            y = scanner.nextInt();
-            if (y > this.size-1) {
-                System.out.println("Input exceeds bounds. Try again.");
-                validY = false;
-            }
-        }
-
-        return new Coordinate(x, y);
-    }
-
-    boolean processTurn(Coordinate c) {
-        if (grid.get(c.x).get(c.y)) {
-            System.out.println("Bomb found.");
-            return false;
-        } else {
-            System.out.println("Spot clear.");
-            return true;
-        }
+        this.setDisplayNumbers();
     }
 
     void createGrid() {
@@ -119,13 +46,35 @@ public class Grid {
         }
 
         for (int i = 0; i < size; i++) {
-            grid.add(new Vector<Boolean>());
+            matrix.add(new Vector<Tile>());
             for (int j = 0; j < size; j++) {
-                grid.get(i).add(false);
+                matrix.get(i).add(new Tile(this, i, j));
             }
         }
 
         gridCreated = true;
+    }
+
+    void setDisplayNumbers() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                matrix.get(i).get(j).checkNeighbours(this.size);
+            }
+        }
+    }
+
+    boolean checkGridState() {
+        for (Tile tile : bombLocations) {
+            if (!tile.hasFlag()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    Tile getTileFromCoordinate(int x, int y) {
+        return matrix.get(x).get(y);
     }
 
     void printGrid() {
@@ -134,11 +83,77 @@ public class Grid {
             return;
         }
 
+        int sideNumbersY = 1;
+
+        System.out.print("\n    ");
+        for (int i = 0; i < this.size; i++) {
+            if (sideNumbersY < 10) {
+                System.out.print(" ");
+            }
+            System.out.print(sideNumbersY + " ");
+            sideNumbersY++;
+        }
+
+        System.out.print("\n    ");
+        for (int i = 0; i < this.size; i++) { System.out.print("__ "); }
         System.out.println();
-        for (Vector<Boolean> vector : grid) {
-            for (boolean bool : vector) {
-                int x = bool ? 1 : 0;
-                System.out.print(x + " ");
+
+        int sideNumbersX = 1;
+
+        for (Vector<Tile> col : matrix) {
+            if (sideNumbersX < 10) { System.out.print(" "); }
+            System.out.print(sideNumbersX + " | ");
+            sideNumbersX++;
+
+            for (Tile tile : col) {
+                char x = tile.hasFlag() ? 'F' : 'W';
+                if (tile.isRevealed()) {
+                    System.out.print(tile.neighbouringBombs + "  ");
+                    //reveal immediate neighbours recursively if they also == 0
+                } else {
+                    System.out.print(x + "  ");
+                }
+
+            }
+
+            System.out.println();
+        }
+    }
+
+    void printGridAsIs() {
+        if (!gridCreated) {
+            System.out.println("Need to create grid before printing.");
+            return;
+        }
+
+        int sideNumbersY = 1;
+
+        System.out.print("\n    ");
+        for (int i = 0; i < this.size; i++) {
+            if (sideNumbersY < 10) {
+                System.out.print(" ");
+            }
+            System.out.print(sideNumbersY + " ");
+            sideNumbersY++;
+        }
+
+        System.out.print("\n    ");
+        for (int i = 0; i < this.size; i++) { System.out.print("__ "); }
+        System.out.println();
+
+        int sideNumbersX = 1;
+
+        for (Vector<Tile> col : matrix) {
+            if (sideNumbersX < 10) { System.out.print(" "); }
+            System.out.print(sideNumbersX + " | ");
+            sideNumbersX++;
+
+            for (Tile tile : col) {
+                if (tile.hasBomb()) {
+                    System.out.print("B  ");
+                } else {
+                    System.out.print(tile.neighbouringBombs + "  ");
+                }
             }
             System.out.println();
         }
@@ -150,13 +165,11 @@ public class Grid {
             while (!isValid) {
                 isValid = true;
                 Coordinate c = Coordinate.getRandomCoordinate(this.size);
-                System.out.println("Bomb placed at (" + c.x + ", " + c.y + ").");
-                if (!bombLocations.contains(c)) {
-                    bombLocations.add(c);
-                    grid.get(c.x).set(c.y, true);
-                } else {
-                    System.out.println("Duplicate found, trying again.");
+                if (matrix.get(c.x).get(c.y).hasBomb()) {
                     isValid = false;
+                } else {
+                    bombLocations.add(matrix.get(c.x).get(c.y));
+                    matrix.get(c.x).get(c.y).plantBomb();
                 }
             }
         }
