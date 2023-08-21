@@ -35,13 +35,10 @@ public class GameInstance {
         }
     }
 
-
     boolean checkForBomb(Coordinate c) {
         if (grid.matrix.get(c.x).get(c.y).hasBomb()) {
-            System.out.println("Uh oh.");
             return false;
         } else {
-            System.out.println("Spot clear.");
             grid.matrix.get(c.x).get(c.y).revealTile();
             return true;
         }
@@ -94,7 +91,9 @@ public class GameInstance {
             grid.matrix.get(c.x).get(c.y).setFlag();
         } else if (inputChoice.equals("r") || inputChoice.equals("R")) {
             if (!checkForBomb(c)) {
-                System.out.println("Bomb found at (" + c.x + ", " + c.y + ")");
+                int x = c.x + 1;
+                int y = c.y + 1;
+                System.out.println("Bomb found at (" + x + ", " + y + ")");
                 gameStarted = false;
             }
         }

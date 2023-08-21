@@ -58,7 +58,7 @@ public class Grid {
     void setDisplayNumbers() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                matrix.get(i).get(j).checkNeighbours(this.size);
+                matrix.get(i).get(j).checkNeighbours();
             }
         }
     }
@@ -106,15 +106,26 @@ public class Grid {
             sideNumbersX++;
 
             for (Tile tile : col) {
-                char x = tile.hasFlag() ? 'F' : 'W';
                 if (tile.isRevealed()) {
-                    System.out.print(tile.neighbouringBombs + "  ");
-                    //reveal immediate neighbours recursively if they also == 0
+                    if (tile.hasFlag()) {
+                        System.out.print("F  ");
+                    } else {
+                        System.out.print(tile.getNeighbouringBombs() + "  ");
+                    }
                 } else {
+                    System.out.print("W  ");
+                }
+            }
+
+            /*
+            if (tile.isRevealed()) {
+                    System.out.print(tile.getNeighbouringBombs() + "  ");
+                } else {
+                    char x = tile.hasFlag() ? 'F' : 'W';
                     System.out.print(x + "  ");
                 }
-
             }
+             */
 
             System.out.println();
         }
@@ -130,9 +141,7 @@ public class Grid {
 
         System.out.print("\n    ");
         for (int i = 0; i < this.size; i++) {
-            if (sideNumbersY < 10) {
-                System.out.print(" ");
-            }
+            if (sideNumbersY < 10) { System.out.print(" "); }
             System.out.print(sideNumbersY + " ");
             sideNumbersY++;
         }
@@ -149,11 +158,8 @@ public class Grid {
             sideNumbersX++;
 
             for (Tile tile : col) {
-                if (tile.hasBomb()) {
-                    System.out.print("B  ");
-                } else {
-                    System.out.print(tile.neighbouringBombs + "  ");
-                }
+                if (tile.hasBomb()) { System.out.print("B  "); }
+                else { System.out.print(tile.getNeighbouringBombs() + "  "); }
             }
             System.out.println();
         }
